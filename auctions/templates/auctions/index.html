@@ -1,0 +1,28 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1>Active Listings</h1>
+  <form action = "{% url 'specific_category' %}" method = "GET" class = "my -3">
+    <label>Choose a category </label>
+    <select name = "category" >
+      {% for cat in category %}
+      <option value = "{{ cat }}">{{ cat }}</option>
+    {% endfor %}
+    </select>
+    <button> Select</button>
+  </form>  
+    
+    <div class = "row mx-3">
+    {% for listing in listings %}
+    <div class="card" style="width: 18rem;" >
+        <img class="card-img-top" src="{{ listing.ImageUrl }}" alt="Card image cap" style = "height: 130px; width: 300px">
+        <div class="card-body">
+          <h5 class="card-title">{{ listing.title }}</h5>
+          <p class="card-text">{{ listing.description }}</p>
+          <h6>{{ listing.price }}fcfa</h6>
+          <a href="{% url 'Listing_page' listing.id %}" class="btn btn-primary">Place a bid</a>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+{% endblock %}

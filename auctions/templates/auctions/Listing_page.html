@@ -1,0 +1,101 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+{% if message %}
+    {% if update %}
+<div class="alert alert-success" role="alert">
+        {{ message }}
+</div>
+    {% else %}
+<div class="alert alert-danger" role="alert">
+        {{ message }}
+</div>        
+    {% endif %}
+
+{% endif %}
+{% if not listing.isActive and user == listing.price.user%}
+<div class="alert alert-success" role="alert">
+    "Congratulations! You won the Auction"
+</div>
+{% endif %}
+{% if user.is_authenticated %}
+    {% if isOwner %}
+    <form action = "{% url 'close_auction' listing.id %}"  method = "POST" >
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning">Close auction</button>
+    </form>
+    {% endif %}
+    {% if isListingInWatchlist %}
+    <form method = "POST" action = "{% url 'remove_watchlist' listing.id %}">
+        {% csrf_token %}
+        <button class = "btn btn-danger">Remove from watchlist </button>
+    </form>
+        {% else %}
+    <form method = "POST" action = "{% url 'add_watchlist' listing.id %}">
+        {% csrf_token %}
+        <button class = "btn btn-success">Add to watchlist </button>
+    </form>    
+    {% endif %}
+{% endif %}
+<div class="tex-align: center">
+    {% if listing.ImageUrl %}
+    <div class="listing-page-img-wrapper m-4">
+        <img src = "{{ listing.ImageUrl }}" style = "width: 800px; float:left; margin-left: 50px">
+    </div> 
+    {% endif %}
+    <div style="text-align:justify">
+        <h2> {{ listing.title }}</h2>
+        <p>Current Price <strong>{{listing.price}} cfa </strong></p>
+        {% if user.is_authenticated and listing.isActive %}
+        <form action="{% url 'addBid' listing.id%}" method = "POST">
+            {% csrf_token %}
+            <label>Bid: </label>
+            <input type = "number" name = "newBid" min = "0">
+            <input type = "submit">
+        </form>
+        {% endif %}
+        
+        <div class = "card-body mb3">
+            <p class = "card-text">{{ listing.description }}</p>
+        </div> 
+        <h4>Owner {{ listing.owner }}</h4>
+        
+    </div>
+</div>
+
+<div class = "card mb-3">
+  <div class = "card-body">
+
+      {% if user.is_authenticated %}
+      <form action="{% url 'add_comment' listing.id %}" method = "POST">
+          {% csrf_token %}
+          <h4 class = "card-title">Comment: </h4>
+          <textarea  name="comment" rows="4" cols="50"></textarea>
+          <br>
+          <button type="submit" class = "btn btn-warning">Add</button>
+      </form>
+      {% endif %}
+      {% for comment in comments %}
+      <div>
+          <ul>
+            <div>
+
+                <p><strong>{{comment.user}} </strong></p>
+                      <li style="font-size: 20px;
+                      line-height: 18px;
+                      color: #7a8192;
+                      display: block;
+                      background: #f6f6f7;
+                      border: 1px solid #edeff2;
+                      padding: 15px 20px 20px 20px;">{{ comment.comment }}</li>
+              </ul>
+            </div>
+          {% empty %}
+          <p>No comment yet </p>
+      </div>
+      {% endfor %}
+  </div>  
+</div>
+
+
+{% endblock %}
